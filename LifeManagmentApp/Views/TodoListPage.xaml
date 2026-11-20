@@ -3,15 +3,108 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:LifeManagementApp.ViewModels"
+    xmlns:models="clr-namespace:LifeManagementApp.Models"
     x:Class="LifeManagementApp.Views.TodoListPage"
+    x:DataType="viewmodels:TodoListViewModel"
     Title="To-do List">
 
-    <VerticalStackLayout Padding="20">
+    <Grid Padding="20"
+          RowDefinitions="Auto,Auto,Auto,*"
+          RowSpacing="15">
 
         <Label
+            Grid.Row="0"
             Text="My To-do List"
-            FontSize="24" />
+            FontSize="24"
+            FontAttributes="Bold" />
 
-    </VerticalStackLayout>
+        <VerticalStackLayout
+            Grid.Row="1"
+            Spacing="10">
+
+            <Entry
+                Placeholder="Enter task title"
+                Text="{Binding NewTaskTitle, Mode=TwoWay}" />
+
+            <Label Text="Priority (1-5)" />
+
+            <Stepper
+                Minimum="1"
+                Maximum="5"
+                Increment="1"
+                Value="{Binding NewTaskPriority, Mode=TwoWay}" />
+
+            <Label
+                Text="{Binding NewTaskPriority,
+                    StringFormat='Selected priority: {0}'}" />
+
+            <Label Text="Due date" />
+
+            <DatePicker
+                Date="{Binding NewTaskDueDate, Mode=TwoWay}" />
+
+            <Button
+                Text="Add Task"
+                Command="{Binding AddTaskCommand}" />
+
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="Red" />
+
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="2"
+            Spacing="10">
+
+            <Button
+                Text="Sort by Priority"
+                Command="{Binding SortByPriorityCommand}" />
+
+            <Button
+                Text="Sort by Due Date"
+                Command="{Binding SortByDueDateCommand}" />
+
+        </HorizontalStackLayout>
+
+        <CollectionView
+            Grid.Row="3"
+            ItemsSource="{Binding Todos}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:TodoItem">
+
+                    <Border
+                        Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="15"
+                        Margin="0,5">
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label
+                                Text="{Binding Title}"
+                                FontSize="18"
+                                FontAttributes="Bold" />
+
+                            <Label
+                                Text="{Binding Priority,
+                                    StringFormat='Priority: {0}'}" />
+
+                            <Label
+                                Text="{Binding DueDate,
+                                    StringFormat='Due: {0:dd MMM yyyy}'}" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
 
 </ContentPage>

@@ -5,17 +5,28 @@ namespace LifeManagementApp;
 
 public partial class AppShell : Shell
 {
-    public AppShell(TodoListPage todoListPage)
+    public AppShell(
+        HomePage homePage,
+        TodoListPage todoListPage)
     {
         InitializeComponent();
 
-        Items.Clear();
+        var tabBar = new TabBar();
 
-        Items.Add(new ShellContent
+        tabBar.Items.Add(new ShellContent
+        {
+            Title = "Home",
+            Route = "HomePage",
+            Content = homePage
+        });
+
+        tabBar.Items.Add(new ShellContent
         {
             Title = "To-do List",
-            Content = todoListPage,
-            Route = "TodoListPage"
+            Route = "TodoListPage",
+            Content = todoListPage
         });
+
+        Items.Add(tabBar);
     }
 }

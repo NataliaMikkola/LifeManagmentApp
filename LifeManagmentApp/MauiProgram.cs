@@ -43,6 +43,14 @@ namespace LifeManagementApp
             builder.Logging.AddDebug();
 #endif
 
+            builder.Services.AddSingleton<HttpClient>();
+
+            builder.Services.AddTransient<IWeatherService, OpenMeteoWeatherService>();
+
+            builder.Services.AddTransient<HomeViewModel>();
+
+            builder.Services.AddTransient<HomePage>();
+
             return builder.Build();
         }
     }

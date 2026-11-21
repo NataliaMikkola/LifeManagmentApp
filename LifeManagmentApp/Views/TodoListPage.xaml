@@ -9,68 +9,120 @@
     x:DataType="viewmodels:TodoListViewModel"
     Title="To-do List">
 
-    <Grid Padding="20"
-          RowDefinitions="Auto,Auto,Auto,*"
-          RowSpacing="15">
+    <Grid Padding="15"
+          RowDefinitions="Auto,Auto,Auto,Auto,*"
+          RowSpacing="10">
 
+        <!-- Heading -->
         <Label
             Grid.Row="0"
             Text="My To-do List"
-            FontSize="24"
+            FontSize="26"
             FontAttributes="Bold" />
 
-        <VerticalStackLayout
+        <!-- Add/Edit form -->
+        <Border
             Grid.Row="1"
-            Spacing="10">
+            Stroke="Gray"
+            StrokeThickness="1"
+            Padding="12">
 
-            <Entry
-                Placeholder="Enter task title"
-                Text="{Binding NewTaskTitle, Mode=TwoWay}" />
+            <VerticalStackLayout Spacing="8">
 
-            <Label Text="Priority (1-5)" />
+                <Label
+                    Text="{Binding FormTitle}"
+                    FontSize="18"
+                    FontAttributes="Bold" />
 
-            <Stepper
-                Minimum="1"
-                Maximum="5"
-                Increment="1"
-                Value="{Binding NewTaskPriority, Mode=TwoWay}" />
+                <Entry
+                    Placeholder="Task title"
+                    Text="{Binding NewTaskTitle, Mode=TwoWay}" />
 
-            <Label
-                Text="{Binding NewTaskPriority,
-                    StringFormat='Selected priority: {0}'}" />
+                <Label Text="Priority (1-5)" />
 
-            <Label Text="Due date" />
+                <Stepper
+                    Minimum="1"
+                    Maximum="5"
+                    Increment="1"
+                    Value="{Binding NewTaskPriority, Mode=TwoWay}" />
 
-            <DatePicker
-                Date="{Binding NewTaskDueDate, Mode=TwoWay}" />
+                <Label
+                    Text="{Binding NewTaskPriority,
+                        StringFormat='Priority: {0}'}" />
 
-            <Button
-                Text="Add Task"
-                Command="{Binding AddTaskCommand}" />
+                <Label Text="Due date" />
 
-            <Label
-                Text="{Binding ErrorMessage}"
-                TextColor="Red" />
+                <DatePicker
+                    Date="{Binding NewTaskDueDate, Mode=TwoWay}" />
 
-        </VerticalStackLayout>
+                <HorizontalStackLayout Spacing="10">
 
+                    <Button
+                        Text="{Binding SaveButtonText}"
+                        Command="{Binding SaveTaskCommand}" />
+
+                    <Button
+                        Text="Cancel"
+                        IsVisible="{Binding IsEditing}"
+                        Command="{Binding CancelEditCommand}"
+                        BackgroundColor="Gray" />
+
+                </HorizontalStackLayout>
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="Red" />
+
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Filters -->
         <HorizontalStackLayout
             Grid.Row="2"
-            Spacing="10">
+            Spacing="10"
+            VerticalOptions="Center">
+
+            <Label
+                Text="Show:"
+                VerticalOptions="Center" />
+
+            <Picker
+                Title="Filter tasks"
+                WidthRequest="180"
+                ItemsSource="{Binding Filters}"
+                SelectedItem="{Binding SelectedFilter, Mode=TwoWay}" />
+
+        </HorizontalStackLayout>
+
+        <!-- Sorting -->
+        <HorizontalStackLayout
+            Grid.Row="3"
+            Spacing="8">
 
             <Button
-                Text="Sort by Priority"
+                Text="Priority"
+                FontSize="13"
                 Command="{Binding SortByPriorityCommand}" />
 
             <Button
-                Text="Sort by Due Date"
+                Text="Due Date"
+                FontSize="13"
                 Command="{Binding SortByDueDateCommand}" />
 
         </HorizontalStackLayout>
 
+        <!-- Task list -->
         <CollectionView
-            Grid.Row="3"
-            ItemsSource="{Binding Todos}">
+            Grid.Row="4"
+            ItemsSource="{Binding Todos}"
+            SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No tasks to display."
+                    HorizontalOptions="Center"
+                    Margin="0,20" />
+            </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:TodoItem">
@@ -78,15 +130,25 @@
                     <Border
                         Stroke="Gray"
                         StrokeThickness="1"
-                        Padding="15"
-                        Margin="0,5">
+                        Padding="10"
+                        Margin="0,4">
 
-                        <VerticalStackLayout Spacing="5">
+                        <VerticalStackLayout Spacing="8">
 
-                            <Label
-                                Text="{Binding Title}"
-                                FontSize="18"
-                                FontAttributes="Bold" />
+                            <HorizontalStackLayout Spacing="8">
+
+                                <CheckBox
+                                    IsChecked="{Binding IsDone}"
+                                    InputTransparent="True"
+                                    VerticalOptions="Center" />
+
+                                <Label
+                                    Text="{Binding Title}"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    VerticalOptions="Center" />
+
+                            </HorizontalStackLayout>
 
                             <Label
                                 Text="{Binding Priority,
@@ -96,15 +158,38 @@
                                 Text="{Binding DueDate,
                                     StringFormat='Due: {0:dd MMM yyyy}'}" />
 
-                        </VerticalStackLayout>
+                            <HorizontalStackLayout Spacing="8">
 
+                                <Button
+                                    Text="Complete / Undo"
+                                    FontSize="12"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=ToggleCompletedCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Text="Edit"
+                                    FontSize="12"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=EditTaskCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Text="Delete"
+                                    FontSize="12"
+                                    BackgroundColor="IndianRed"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=DeleteTaskCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                            </HorizontalStackLayout>
+
+                        </VerticalStackLayout>
                     </Border>
 
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
         </CollectionView>
 
     </Grid>
-
 </ContentPage>

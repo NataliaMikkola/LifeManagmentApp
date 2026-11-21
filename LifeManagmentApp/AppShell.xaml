@@ -3,12 +3,5 @@
 <Shell
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:LifeManagementApp.Views"
     x:Class="LifeManagementApp.AppShell">
-
-    <ShellContent
-        Title="To-do List"
-        ContentTemplate="{DataTemplate views:TodoListPage}"
-        Route="TodoListPage" />
-
 </Shell>

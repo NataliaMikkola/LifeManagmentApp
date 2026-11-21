@@ -5,10 +5,20 @@ namespace LifeManagementApp.Views;
 
 public partial class TodoListPage : ContentPage
 {
-    public TodoListPage()
+    private readonly TodoListViewModel _viewModel;
+
+    public TodoListPage(TodoListViewModel viewModel)
     {
         InitializeComponent();
 
-        BindingContext = new TodoListViewModel();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        await _viewModel.LoadTasksAsync();
     }
 }

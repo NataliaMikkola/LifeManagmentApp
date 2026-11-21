@@ -3,12 +3,18 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LifeManagementApp.Data;
 using LifeManagementApp.Models;
+using LifeManagementApp.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace LifeManagementApp.ViewModels;
 
 public partial class TodoListViewModel : ObservableObject
 {
+    private readonly TodoService _todoService;
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
+
     public ObservableCollection<TodoItem> Todos { get; } = new();
 
     [ObservableProperty]
@@ -23,29 +29,40 @@ public partial class TodoListViewModel : ObservableObject
     [ObservableProperty]
     private string errorMessage = string.Empty;
 
-    public TodoListViewModel()
+    public TodoListViewModel(
+        TodoService todoService,
+        IDbContextFactory<AppDbContext> contextFactory)
     {
-        Todos.Add(new TodoItem
-        {
-            Id = 1,
-            Title = "Finish LifeManagementApp",
-            Priority = 5,
-            DueDate = DateTime.Today.AddDays(2)
-        });
+        _todoService = todoService;
+        _contextFactory = contextFactory;
+    }
 
-        Todos.Add(new TodoItem
+    public async Task LoadTasksAsync()
+    {
+        try
         {
-            Id = 2,
-            Title = "Study C#",
-            Priority = 3,
-            DueDate = DateTime.Today.AddDays(1)
-        });
+            await using var db =
+                await _contextFactory.CreateDbContextAsync();
 
-        SortByPriority();
+            await db.Database.EnsureCreatedAsync();
+
+            var tasks = await _todoService.GetTodosAsync();
+
+            Todos.Clear();
+
+            foreach (var task in tasks)
+                Todos.Add(task);
+
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Could not load tasks: {ex.Message}";
+        }
     }
 
     [RelayCommand]
-    private void AddTask()
+    private async Task AddTaskAsync()
     {
         if (string.IsNullOrWhiteSpace(NewTaskTitle))
         {
@@ -59,25 +76,29 @@ public partial class TodoListViewModel : ObservableObject
             return;
         }
 
-        var task = new TodoItem
+        try
         {
-            Id = Todos.Count == 0
-                ? 1
-                : Todos.Max(todo => todo.Id) + 1,
-            Title = NewTaskTitle.Trim(),
-            Priority = NewTaskPriority,
-            DueDate = NewTaskDueDate,
-            IsDone = false
-        };
+            var task = new TodoItem
+            {
+                Title = NewTaskTitle.Trim(),
+                Priority = NewTaskPriority,
+                DueDate = NewTaskDueDate,
+                IsDone = false
+            };
 
-        Todos.Add(task);
+            await _todoService.AddTodoAsync(task);
 
-        NewTaskTitle = string.Empty;
-        NewTaskPriority = 1;
-        NewTaskDueDate = DateTime.Today;
-        ErrorMessage = string.Empty;
+            NewTaskTitle = string.Empty;
+            NewTaskPriority = 1;
+            NewTaskDueDate = DateTime.Today;
+            ErrorMessage = string.Empty;
 
-        SortByPriority();
+            await LoadTasksAsync();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Could not save task: {ex.Message}";
+        }
     }
 
     [RelayCommand]
@@ -107,8 +128,6 @@ public partial class TodoListViewModel : ObservableObject
         Todos.Clear();
 
         foreach (var todo in sorted)
-        {
             Todos.Add(todo);
-        }
     }
 }

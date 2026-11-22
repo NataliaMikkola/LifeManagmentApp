@@ -1,14 +1,29 @@
-﻿<?xml version = "1.0" encoding = "UTF-8" ?>
-<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:LifeManagementApp"
-             x:Class="LifeManagementApp.App">
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+<Application
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:LifeManagementApp"
+    xmlns:converters="clr-namespace:LifeManagementApp.Converters"
+    x:Class="LifeManagementApp.App">
+
     <Application.Resources>
         <ResourceDictionary>
+
+            <!-- Value converter -->
+            <converters:BoolToTextConverter
+                x:Key="BoolToTextConverter" />
+
+            <!-- Existing styles -->
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
-                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary
+                    Source="Resources/Styles/Colors.xaml" />
+
+                <ResourceDictionary
+                    Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
         </ResourceDictionary>
     </Application.Resources>
+
 </Application>

@@ -1,10 +1,8 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LifeManagementApp.Data;
 using LifeManagementApp.Models;
 using LifeManagementApp.Services;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -13,7 +11,6 @@ namespace LifeManagementApp.ViewModels;
 public partial class TodoListViewModel : ObservableObject
 {
     private readonly ITodoRepository _todoService;
-    private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
     private List<TodoItem> _allTasks = new();
     private string _sortMode = "Priority";
@@ -52,12 +49,9 @@ public partial class TodoListViewModel : ObservableObject
     public string SaveButtonText =>
         IsEditing ? "Save Changes" : "Add Task";
 
-    public TodoListViewModel(
-        ITodoRepository todoService,
-        IDbContextFactory<AppDbContext> contextFactory)
+    public TodoListViewModel(ITodoRepository todoService)
     {
         _todoService = todoService;
-        _contextFactory = contextFactory;
     }
 
     partial void OnIsEditingChanged(bool value)
@@ -75,11 +69,6 @@ public partial class TodoListViewModel : ObservableObject
     {
         try
         {
-            await using var db =
-                await _contextFactory.CreateDbContextAsync();
-
-            await db.Database.EnsureCreatedAsync();
-
             _allTasks = await _todoService.GetTodosAsync();
 
             RefreshList();
@@ -96,9 +85,13 @@ public partial class TodoListViewModel : ObservableObject
         IEnumerable<TodoItem> tasks = _allTasks;
 
         if (SelectedFilter == "Active")
+        {
             tasks = tasks.Where(t => !t.IsDone);
+        }
         else if (SelectedFilter == "Completed")
+        {
             tasks = tasks.Where(t => t.IsDone);
+        }
 
         tasks = _sortMode == "DueDate"
             ? tasks.OrderBy(t => t.DueDate)
@@ -109,7 +102,9 @@ public partial class TodoListViewModel : ObservableObject
         Todos.Clear();
 
         foreach (var task in tasks)
+        {
             Todos.Add(task);
+        }
     }
 
     [RelayCommand]
@@ -220,7 +215,9 @@ public partial class TodoListViewModel : ObservableObject
             await _todoService.DeleteTodoAsync(task.Id);
 
             if (_editingTaskId == task.Id)
+            {
                 ResetForm();
+            }
 
             await LoadTasksAsync();
         }

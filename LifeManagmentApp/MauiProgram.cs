@@ -18,38 +18,54 @@ namespace LifeManagementApp
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont(
+                        "OpenSans-Regular.ttf",
+                        "OpenSansRegular");
+
+                    fonts.AddFont(
+                        "OpenSans-Semibold.ttf",
+                        "OpenSansSemibold");
                 });
 
-            // Store the SQLite database in Android's app data folder.
+            // SQLite database location.
             string dbPath = Path.Combine(
                 FileSystem.AppDataDirectory,
                 "lifemanagement.db");
 
-            // Register the database.
+            // Register EF Core database factory.
             builder.Services.AddDbContextFactory<AppDbContext>(
                 options => options.UseSqlite(
                     $"Data Source={dbPath}"));
 
-            // Register the task service.
-            builder.Services.AddTransient<ITodoRepository, TodoService>();
-            builder.Services.AddTransient<AppShell>();
-            builder.Services.AddTransient<LifeManagementApp.ViewModels.TodoListViewModel>();
-            builder.Services.AddTransient<LifeManagementApp.Views.TodoListPage>();
+            // Register database initialization service.
+            builder.Services.AddSingleton<
+                DatabaseInitializationService>();
 
+            // Register repository interface and implementation.
+            builder.Services.AddTransient<
+                ITodoRepository, TodoService>();
+
+            // Register Shell navigation.
+            builder.Services.AddTransient<AppShell>();
+
+            // Register To-do page and ViewModel.
+            builder.Services.AddTransient<TodoListViewModel>();
+            builder.Services.AddTransient<TodoListPage>();
+
+            // Register HTTP client.
+            builder.Services.AddSingleton<HttpClient>();
+
+            // Register weather service.
+            builder.Services.AddTransient<
+                IWeatherService, OpenMeteoWeatherService>();
+
+            // Register Home page and ViewModel.
+            builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<HomePage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-
-            builder.Services.AddSingleton<HttpClient>();
-
-            builder.Services.AddTransient<IWeatherService, OpenMeteoWeatherService>();
-
-            builder.Services.AddTransient<HomeViewModel>();
-
-            builder.Services.AddTransient<HomePage>();
 
             return builder.Build();
         }

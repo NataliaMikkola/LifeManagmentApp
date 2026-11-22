@@ -8,15 +8,21 @@ namespace LifeManagementApp.Services;
 public class TodoService : ITodoRepository
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
+    private readonly DatabaseInitializationService _databaseInitialization;
 
     public TodoService(
-        IDbContextFactory<AppDbContext> contextFactory)
+        IDbContextFactory<AppDbContext> contextFactory,
+        DatabaseInitializationService databaseInitialization)
     {
         _contextFactory = contextFactory;
+        _databaseInitialization = databaseInitialization;
     }
 
     public async Task<List<TodoItem>> GetTodosAsync()
     {
+        // Ensure the SQLite database exists before reading tasks.
+        await _databaseInitialization.InitializeAsync();
+
         await using var db =
             await _contextFactory.CreateDbContextAsync();
 

@@ -1,7 +1,6 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IntelliJ.Lang.Annotations;
 using LifeManagementApp.Data;
 using LifeManagementApp.Models;
 using LifeManagementApp.Services;
@@ -13,7 +12,7 @@ namespace LifeManagementApp.ViewModels;
 
 public partial class TodoListViewModel : ObservableObject
 {
-    private readonly TodoService _todoService;
+    private readonly ITodoRepository _todoService;
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
     private List<TodoItem> _allTasks = new();
@@ -54,7 +53,7 @@ public partial class TodoListViewModel : ObservableObject
         IsEditing ? "Save Changes" : "Add Task";
 
     public TodoListViewModel(
-        TodoService todoService,
+        ITodoRepository todoService,
         IDbContextFactory<AppDbContext> contextFactory)
     {
         _todoService = todoService;

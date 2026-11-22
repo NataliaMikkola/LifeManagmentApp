@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LifeManagementApp.Services;
 
-public class TodoService
+public class TodoService : ITodoRepository
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
@@ -33,6 +33,7 @@ public class TodoService
             await _contextFactory.CreateDbContextAsync();
 
         db.Todos.Add(todo);
+
         await db.SaveChangesAsync();
 
         return todo;
@@ -44,6 +45,7 @@ public class TodoService
             await _contextFactory.CreateDbContextAsync();
 
         db.Todos.Update(todo);
+
         await db.SaveChangesAsync();
     }
 
@@ -54,10 +56,11 @@ public class TodoService
 
         var todo = await db.Todos.FindAsync(id);
 
-        if (todo is null)
+        if (todo == null)
             return;
 
         db.Todos.Remove(todo);
+
         await db.SaveChangesAsync();
     }
 }

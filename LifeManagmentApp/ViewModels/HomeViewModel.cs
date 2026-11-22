@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LifeManagementApp.Models;
@@ -9,7 +10,7 @@ namespace LifeManagementApp.ViewModels;
 
 public partial class HomeViewModel : ObservableObject
 {
-    private readonly TodoService _todoService;
+    private readonly ITodoRepository _todoService;
     private readonly IWeatherService _weatherService;
 
     public ObservableCollection<TodoItem> TopTasks { get; } = new();
@@ -30,7 +31,7 @@ public partial class HomeViewModel : ObservableObject
     private string errorMessage = string.Empty;
 
     public HomeViewModel(
-        TodoService todoService,
+        ITodoRepository todoService,
         IWeatherService weatherService)
     {
         _todoService = todoService;
@@ -80,7 +81,9 @@ public partial class HomeViewModel : ObservableObject
             TemperatureText = "-- °C";
             WindSpeedText = "-- m/s";
             IsKitesurfWeather = false;
-            ErrorMessage += " Could not load weather. Check internet connection.";
+
+            ErrorMessage +=
+                " Could not load weather. Check internet connection.";
         }
         finally
         {

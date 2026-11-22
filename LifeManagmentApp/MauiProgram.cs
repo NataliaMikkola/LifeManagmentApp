@@ -33,7 +33,7 @@ namespace LifeManagementApp
                     $"Data Source={dbPath}"));
 
             // Register the task service.
-            builder.Services.AddTransient<TodoService>();
+            builder.Services.AddTransient<ITodoRepository, TodoService>();
             builder.Services.AddTransient<AppShell>();
             builder.Services.AddTransient<LifeManagementApp.ViewModels.TodoListViewModel>();
             builder.Services.AddTransient<LifeManagementApp.Views.TodoListPage>();

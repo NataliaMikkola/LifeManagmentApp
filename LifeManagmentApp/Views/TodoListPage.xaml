@@ -3,15 +3,193 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:LifeManagementApp.ViewModels"
+    xmlns:models="clr-namespace:LifeManagementApp.Models"
     x:Class="LifeManagementApp.Views.TodoListPage"
+    x:DataType="viewmodels:TodoListViewModel"
     Title="To-do List">
 
-    <VerticalStackLayout Padding="20">
+    <Grid Padding="15"
+          RowDefinitions="Auto,Auto,Auto,Auto,*"
+          RowSpacing="10">
 
+        <!-- Heading -->
         <Label
+            Grid.Row="0"
             Text="My To-do List"
-            FontSize="24" />
+            FontSize="26"
+            FontAttributes="Bold" />
 
-    </VerticalStackLayout>
+        <!-- Add/Edit form -->
+        <Border
+            Grid.Row="1"
+            Stroke="Gray"
+            StrokeThickness="1"
+            Padding="12">
 
+            <VerticalStackLayout Spacing="8">
+
+                <Label
+                    Text="{Binding FormTitle}"
+                    FontSize="18"
+                    FontAttributes="Bold" />
+
+                <Entry
+                    Placeholder="Task title"
+                    Text="{Binding NewTaskTitle, Mode=TwoWay}" />
+
+                <Label Text="Priority (1-5)" />
+
+                <Stepper
+                    Minimum="1"
+                    Maximum="5"
+                    Increment="1"
+                    Value="{Binding NewTaskPriority, Mode=TwoWay}" />
+
+                <Label
+                    Text="{Binding NewTaskPriority,
+                        StringFormat='Priority: {0}'}" />
+
+                <Label Text="Due date" />
+
+                <DatePicker
+                    Date="{Binding NewTaskDueDate, Mode=TwoWay}" />
+
+                <HorizontalStackLayout Spacing="10">
+
+                    <Button
+                        Text="{Binding SaveButtonText}"
+                        Command="{Binding SaveTaskCommand}" />
+
+                    <Button
+                        Text="Cancel"
+                        IsVisible="{Binding IsEditing}"
+                        Command="{Binding CancelEditCommand}"
+                        BackgroundColor="Gray" />
+
+                </HorizontalStackLayout>
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="Red" />
+
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Filters -->
+        <HorizontalStackLayout
+            Grid.Row="2"
+            Spacing="10"
+            VerticalOptions="Center">
+
+            <Label
+                Text="Show:"
+                VerticalOptions="Center" />
+
+            <Picker
+                Title="Filter tasks"
+                WidthRequest="180"
+                ItemsSource="{Binding Filters}"
+                SelectedItem="{Binding SelectedFilter, Mode=TwoWay}" />
+
+        </HorizontalStackLayout>
+
+        <!-- Sorting -->
+        <HorizontalStackLayout
+            Grid.Row="3"
+            Spacing="8">
+
+            <Button
+                Text="Priority"
+                FontSize="13"
+                Command="{Binding SortByPriorityCommand}" />
+
+            <Button
+                Text="Due Date"
+                FontSize="13"
+                Command="{Binding SortByDueDateCommand}" />
+
+        </HorizontalStackLayout>
+
+        <!-- Task list -->
+        <CollectionView
+            Grid.Row="4"
+            ItemsSource="{Binding Todos}"
+            SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No tasks to display."
+                    HorizontalOptions="Center"
+                    Margin="0,20" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:TodoItem">
+
+                    <Border
+                        Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="0,4">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <HorizontalStackLayout Spacing="8">
+
+                                <CheckBox
+                                    IsChecked="{Binding IsDone}"
+                                    InputTransparent="True"
+                                    VerticalOptions="Center" />
+
+                                <Label
+                                    Text="{Binding Title}"
+                                    FontSize="17"
+                                    FontAttributes="Bold"
+                                    VerticalOptions="Center" />
+
+                            </HorizontalStackLayout>
+
+                            <Label
+                                Text="{Binding Priority,
+                                    StringFormat='Priority: {0}'}" />
+
+                            <Label
+                                Text="{Binding DueDate,
+                                    StringFormat='Due: {0:dd MMM yyyy}'}" />
+
+                            <HorizontalStackLayout Spacing="8">
+
+                                <Button
+                                    Text="Complete / Undo"
+                                    FontSize="12"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=ToggleCompletedCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Text="Edit"
+                                    FontSize="12"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=EditTaskCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Text="Delete"
+                                    FontSize="12"
+                                    BackgroundColor="IndianRed"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodoListViewModel}},
+                                                      Path=DeleteTaskCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                            </HorizontalStackLayout>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
 </ContentPage>
